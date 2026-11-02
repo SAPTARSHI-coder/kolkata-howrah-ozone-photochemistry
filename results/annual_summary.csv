@@ -1,0 +1,12 @@
+Parameter,Unit,Conurbation_Mean_SD,Min_Station_Mean,Min_Station_Name,Max_Station_Mean,Max_Station_Name
+PM2.5,ug/m3,49.5 ± 41.1,37.6,Rabindra Sarovar,66.1,Ghusuri
+PM10,ug/m3,97.8 ± 72.6,71.2,Rabindra Sarovar,121.3,Dasnagar
+NO,ug/m3,17.8 ± 26.1,4.3,Botanical Garden,33.2,Jadavpur
+NO2,ug/m3,27.1 ± 24.1,14.9,Barrackpore,44.7,Rabindra Sarovar
+NOx,ppb,29.4 ± 29.9,11.5,Botanical Garden,42.7,Jadavpur
+SO2,ug/m3,8.1 ± 6.9,4.7,Jadavpur,11.9,Dasnagar
+CO,mg/m3,0.74 ± 0.59,0.42,Belur Math,1.22,Dasnagar
+Ozone,ug/m3,26.9 ± 24.3,16.9,Barrackpore,48.8,Dasnagar
+AT,deg C,26.9 ± 4.8,26.0,Barrackpore,28.2,Jadavpur
+RH,%,76.7 ± 18.2,68.6,Belur Math,81.3,Barrackpore
+WS,m/s,0.85 ± 1.09,0.33,Bidhannagar,1.72,Fort William

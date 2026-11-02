@@ -1,0 +1,14 @@
+Station_Name,Code,Zone_Classification,BTEX_ug_m3,NOx_ppb,BTEX_NOx_ratio,Midday_NO2_NO_ratio,Ox_mean_ug_m3,Ox_sd_ug_m3
+Barrackpore (SVSPA),SVSPA,Industrial/Suburban,13.6,17.0,0.803,2.55,31.8,19.2
+Victoria Memorial (VC),VC,Urban Background,9.1,25.7,0.352,1.5,46.5,27.0
+Rabindra Sarovar (RS),RS,Urban Park,12.5,42.1,0.296,2.13,73.6,42.6
+Padmapukur (PP),PP,Industrial/Residential,15.7,28.1,0.558,1.47,48.0,25.3
+Jadavpur (JD),JD,Mixed Urban,29.5,42.7,0.691,1.29,52.6,30.7
+Dasnagar (DN),DN,Heavy Industrial,20.3,34.7,0.584,3.91,88.3,44.3
+Fort William (FW),FW,Semi-Urban/Military,8.9,36.4,0.245,2.44,74.1,36.5
+Ghusuri (GH),GH,Heavy Industrial,18.4,25.3,0.728,2.41,37.9,23.4
+Rabindra Bharati Univ (RBU),RBU,Traffic Hotspot,16.3,36.6,0.446,2.05,59.8,33.2
+Botanical Garden (BOG),BOG,Green Background,34.3,11.5,2.984,5.71,40.5,22.8
+Belur Math (BM),BM,Religious/Mixed,13.4,33.8,0.397,2.09,52.3,30.9
+Ballygunge (BG),BG,Residential Traffic,24.3,44.8,0.542,2.88,57.3,33.1
+Bidhannagar (BN),BN,Commercial Corridor,12.2,30.5,0.4,1.43,48.6,26.7

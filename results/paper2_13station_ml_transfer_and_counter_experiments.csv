@@ -1,0 +1,14 @@
+Station_Name,Code,Zone_Classification,Test_R2,RMSE_ug_m3,MAE_ug_m3,Transfer_Regime
+Barrackpore (SVSPA),SVSPA,Industrial/Suburban,0.6825,11.43,6.29,Robust Generalization
+Victoria Memorial (VC),VC,Urban Background,0.5914,12.51,8.17,Robust Generalization
+Rabindra Sarovar (RS),RS,Urban Park,0.5008,21.37,16.34,Robust Generalization
+Padmapukur (PP),PP,Industrial/Residential,0.4865,15.16,9.9,Moderate Generalization
+Jadavpur (JD),JD,Mixed Urban,0.4712,13.08,8.93,Moderate Generalization
+Dasnagar (DN),DN,Heavy Industrial,0.4237,30.33,23.38,Moderate Generalization
+Fort William (FW),FW,Semi-Urban/Military,0.288,18.04,13.53,Moderate Generalization
+Ghusuri (GH),GH,Heavy Industrial,0.0714,21.39,10.85,Weak Generalization
+Rabindra Bharati Univ (RBU),RBU,Traffic Hotspot,0.0755,29.29,19.18,Predictive Breakdown
+Botanical Garden (BOG),BOG,Green Background,0.0499,17.04,12.92,Predictive Breakdown (Advection)
+Belur Math (BM),BM,Religious/Mixed,0.0175,18.32,13.65,Predictive Breakdown
+Ballygunge (BG),BG,Residential Traffic,-0.1722,15.6,11.23,Severe Negative Generalization
+Bidhannagar (BN),BN,Commercial Corridor,-0.2577,13.83,9.15,Severe Negative Generalization

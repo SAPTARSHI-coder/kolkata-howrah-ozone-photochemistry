@@ -1,0 +1,2 @@
+Station,Model,Train_Year,Test_Year,R2,RMSE,MAE
+Bidhannagar,Random Forest,2024,2025,-0.2577,13.83,9.15

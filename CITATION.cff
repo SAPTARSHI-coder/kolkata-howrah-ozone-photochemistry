@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software or data, please cite it as below."
+authors:
+  - family-names: Sadhu
+    given-names: Saptarshi
+    affiliation: "School of Engineering and Technology, Adamas University, Kolkata 700126, India"
+    email: "saptarshi1.sadhu@stu.adamasuniversity.ac.in"
+title: "Ground-Level Ozone Photochemistry, Statistical Distribution Tail Modeling, and Meteorological Machine Learning Generalization across an Urban-Industrial Megacity Airshed"
+version: 1.0.0
+date-released: 2026-10-27
+url: "https://github.com/SAPTARSHI-coder/kolkata-howrah-ozone-photochemistry"
+preferred-citation:
+  type: article
+  authors:
+    - family-names: Sadhu
+      given-names: Saptarshi
+  journal: "Atmospheric Environment"
+  title: "Ground-Level Ozone Photochemistry, Statistical Distribution Tail Modeling, and Meteorological Machine Learning Generalization across an Urban-Industrial Megacity Airshed"
+  year: 2026
+  publisher: "Elsevier"
