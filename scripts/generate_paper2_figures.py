@@ -71,8 +71,8 @@ def generate_figure1():
     # Natural S-curve meander function
     river_lons = 88.355 - 0.045 * np.sin((river_lats - 22.50) * 12) - 0.015 * (river_lats - 22.50)
     ax.plot(river_lons, river_lats, color='#2980b9', linewidth=10, alpha=0.6, zorder=2)
-    ax.text(88.352, 22.70, "Hooghly River\n(Mesoscale Transport Corridor)", 
-            color='#1b4f72', fontsize=9, fontweight='bold', rotation=-78, alpha=0.85)
+    ax.text(88.318, 22.695, "Hooghly River\n(Mesoscale Transport Corridor)", 
+            color='#1b4f72', fontsize=9, fontweight='bold', rotation=-62, ha="center", va="center", alpha=0.85)
 
     # Shaded district zones
     ax.fill_betweenx([22.52, 22.65], 88.27, 88.33, color='#e5e8e8', alpha=0.6, zorder=1)
@@ -120,7 +120,7 @@ def generate_figure1():
                         zorder=6)
 
     # Inset Wind Rose (Winter vs Summer Prevailing Drainage)
-    inset_ax = fig.add_axes([0.65, 0.68, 0.22, 0.20], polar=True)
+    inset_ax = fig.add_axes([0.69, 0.69, 0.20, 0.19], polar=True)
     theta = np.linspace(0, 2*np.pi, 16, endpoint=False)
     # Winter NNE drainage flow (peak between 20° and 45°, indices 1 and 2)
     winter_wind = np.array([2.2, 3.8, 3.2, 1.4, 0.4, 0.2, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.2, 0.3, 0.6, 1.2])
@@ -140,7 +140,7 @@ def generate_figure1():
     inset_ax.set_theta_direction(-1)
     inset_ax.set_title("Prevailing Wind Regimes", fontsize=8.5, fontweight='bold', pad=10)
     inset_ax.set_yticklabels([])
-    inset_ax.legend(loc='lower center', bbox_to_anchor=(0.5, -0.45), fontsize=7, frameon=True)
+    inset_ax.legend(loc='lower center', bbox_to_anchor=(0.5, -0.45), fontsize=6.5, frameon=True)
 
     ax.set_xlabel('Longitude (°E)', fontweight='bold')
     ax.set_ylabel('Latitude (°N)', fontweight='bold')
