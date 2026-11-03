@@ -60,22 +60,22 @@ kolkata-howrah-ozone-photochemistry/
 │   ├── master_cleaned.pkl.gz                          <-- Quality-controlled 15-min master dataframe (28.8 MB)
 │   ├── stations_13_metadata.csv                       <-- Station coordinates, elevation & land-use archetypes
 │   ├── master_station_metadata.csv                    <-- Extended auditing metadata
-│   ├── paper2_bidhannagar_hourly_2024_2025.csv        <-- Bidhannagar roadside ML forward transfer dataset
-│   ├── paper2_182_series_distribution_ranking.csv     <-- Precomputed 182-series distribution evaluation
-│   ├── paper2_distribution_reproduction.csv           <-- Distribution recomputation validation metrics
-│   └── paper2_forward_transfer_results.csv            <-- Random Forest cross-year baseline results
+│   ├── bidhannagar_hourly_2024_2025.csv        <-- Bidhannagar roadside ML forward transfer dataset
+│   ├── mle_182_series_distribution_ranking.csv     <-- Precomputed 182-series distribution evaluation
+│   ├── distribution_fitting_metrics.csv           <-- Distribution recomputation validation metrics
+│   └── ml_forward_transfer_baseline.csv            <-- Random Forest cross-year baseline results
 │
 ├── results/
 │   ├── annual_summary.csv                             <-- Table 2: 13-station conurbation criteria summaries
-│   ├── paper2_photochemical_regime_indicators.csv     <-- Table 3: Station-wise photochemical indicators
-│   ├── paper2_182_series_distribution_ranking.csv     <-- Table 4: 182-series MLE distribution rankings
-│   └── paper2_13station_ml_transfer_and_counter_experiments.csv <-- Table 5: 13-station ML transfer & counter-experiments
+│   ├── photochemical_regime_indicators.csv     <-- Table 3: Station-wise photochemical indicators
+│   ├── mle_182_series_distribution_ranking.csv     <-- Table 4: 182-series MLE distribution rankings
+│   └── cross_year_ml_transfer_and_counter_experiments.csv <-- Table 5: 13-station ML transfer & counter-experiments
 │
 └── scripts/
-    ├── generate_paper2_figures.py                     <-- Figures 1–7 generation pipeline
+    ├── generate_figures.py                     <-- Figures 1–7 generation pipeline
     ├── compute_regime_table.py                        <-- Computes Table 3 photochemical indicators
-    ├── recompute_paper2_distributions.py              <-- 182-series MLE two-parameter distribution fitting
-    ├── paper2_rf_forward_transfer.py                  <-- Cross-year Random Forest transfer & counter-experiments
+    ├── fit_statistical_distributions.py              <-- 182-series MLE two-parameter distribution fitting
+    ├── evaluate_ml_transferability.py                  <-- Cross-year Random Forest transfer & counter-experiments
     ├── generate_graphical_abstract.py                 <-- Graphical abstract generator
     ├── inspect_diurnal.py                             <-- Diurnal odd-oxygen titration inspection
     └── run_proof.sh                                   <-- End-to-end execution script
@@ -100,7 +100,7 @@ pip install -r requirements.txt
 ### 1. Recompute 182-Series Distribution Fitting (Table 4 & Figure 6)
 Fits zero-location (`floc=0`) Lognormal, Gamma, and Weibull distributions across all 182 spatiotemporal series:
 ```bash
-python scripts/recompute_paper2_distributions.py
+python scripts/fit_statistical_distributions.py
 ```
 
 ### 2. Compute Photochemical Regime Indicators (Table 3)
@@ -112,13 +112,13 @@ python scripts/compute_regime_table.py
 ### 3. Run Machine Learning Forward Transfer & Chemical Counter-Experiments (Table 5 & Figure 7)
 Evaluates cross-year Random Forest generalization and proves nitric oxide titration recovery:
 ```bash
-python scripts/paper2_rf_forward_transfer.py
+python scripts/evaluate_ml_transferability.py
 ```
 
 ### 4. Generate All 7 Publication Figures
 Generates high-resolution publication figures (300 DPI) matching the manuscript:
 ```bash
-python scripts/generate_paper2_figures.py
+python scripts/generate_figures.py
 ```
 
 ---

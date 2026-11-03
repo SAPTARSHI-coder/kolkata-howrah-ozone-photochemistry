@@ -145,11 +145,10 @@ ax.text(71, 32.5, "2. Adding Co-Located Chemical Sinks:\n   Met + NO + NO2 → R
 ax.text(71, 23.5, "3. Cross-Validation Chemical Accuracy:\n   5-Fold CV Met-Only: R² = 0.6808\n   5-Fold CV + NO & NO2: R² = 0.7800", fontsize=8, color='#1e8449')
 ax.text(71, 14.5, "4. Odd-Oxygen Photochemical Closure:\n   Modeling [Ox] = [O3] + [NO2] yields:\n   R² = 0.9533  (Near-Perfect Closure!)", fontsize=8, fontweight='bold', color='#1e8449')
 
-output_path1 = "/Users/saptarshisadhu/Desktop/5_PAPERS/02_Paper_2_Atmospheric_Environment/figures/graphical_abstract.png"
-output_path2 = "/Users/saptarshisadhu/Desktop/5_PAPERS/02_Paper_2_Atmospheric_Environment/03_SUBMISSION_DOCUMENTS/graphical_abstract.png"
+script_dir = os.path.dirname(os.path.abspath(__file__))
+output_path1 = os.path.abspath(os.path.join(script_dir, "../figures/graphical_abstract.png"))
+os.makedirs(os.path.dirname(output_path1), exist_ok=True)
 
 plt.savefig(output_path1, dpi=300, bbox_inches='tight', facecolor=fig.get_facecolor(), edgecolor='none')
-plt.savefig(output_path2, dpi=300, bbox_inches='tight', facecolor=fig.get_facecolor(), edgecolor='none')
 plt.close()
 print(f"--> Saved {output_path1}")
-print(f"--> Saved {output_path2}")

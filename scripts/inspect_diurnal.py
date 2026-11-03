@@ -1,7 +1,10 @@
 import pandas as pd
 import numpy as np
 
-df = pd.read_pickle("/Users/saptarshisadhu/Desktop/5_PAPERS/02_Paper_2_Atmospheric_Environment/data/master_cleaned.pkl.gz")
+import os
+script_dir = os.path.dirname(os.path.abspath(__file__))
+pkl_path = os.path.abspath(os.path.join(script_dir, "../data/master_cleaned.pkl.gz"))
+df = pd.read_pickle(pkl_path)
 
 stations = ["SVSPA", "VC", "RBU", "DN"]
 diurnal = df[df["Station"].isin(stations)].groupby(["Station", "Hour"])[["Ozone", "NO", "NO2", "NOx"]].mean().reset_index()

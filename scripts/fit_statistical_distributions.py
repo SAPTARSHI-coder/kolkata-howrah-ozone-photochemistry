@@ -1,5 +1,5 @@
 """
-Paper 2: Recomputation and Ranking of Statistical Distributions (Weibull, Gamma, Lognormal)
+Statistical Tail Modeling and Goodness-of-Fit Evaluation (Weibull, Gamma, Lognormal)
 Fits 2-parameter distributions (floc=0) across 182 pollutant time-series across all 13 CAAQMS stations.
 Calculates log-likelihood, AIC, BIC, and Kolmogorov-Smirnov test statistics.
 """
@@ -12,13 +12,13 @@ import pandas as pd
 import scipy.stats as stats
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
-ranking_csv = os.path.join(script_dir, 'paper2_182_series_distribution_ranking.csv')
-out_csv = os.path.join(script_dir, 'paper2_distribution_reproduction.csv')
+ranking_csv = os.path.join(script_dir, '../data/mle_182_series_distribution_ranking.csv')
+out_csv = os.path.join(script_dir, '../results/distribution_fitting_metrics.csv')
 
 cache_candidates = [
     os.environ.get('DATA_CACHE', ''),
-    os.path.abspath(os.path.join(script_dir, '../../../../Research_Recovery_Audit/phase2/data_cache/master_cleaned.pkl.gz')),
-    '/Users/saptarshisadhu/Desktop/Research_Recovery_Audit/phase2/data_cache/master_cleaned.pkl.gz'
+    os.path.abspath(os.path.join(script_dir, '../data/master_cleaned.pkl.gz')),
+    os.path.abspath(os.path.join(script_dir, 'master_cleaned.pkl.gz'))
 ]
 cache_pkl = next((c for c in cache_candidates if c and os.path.exists(c)), None)
 

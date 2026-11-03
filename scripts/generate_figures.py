@@ -1,5 +1,5 @@
 """
-Comprehensive Figure Generation Script for Paper 2 (Atmospheric Environment, Elsevier)
+Comprehensive Publication Figure Generation Pipeline: Ground-Level Ozone Photochemistry
 Generates all 7 publication-grade figures at 300 DPI directly from master_cleaned.pkl.gz.
 """
 
