@@ -62,7 +62,7 @@ ax.text(6, 26, "• Lognormal Optimality (81.3% AIC, 74.7% KS):\n  100% VOCs, 73
         fontsize=8, color='#2c3e50', va='top')
 ax.text(6, 17, "• Gamma Role (15.4%):\n  Optimal in 26.9% PM2.5 & CO (discrete Poisson\n  combustion emissions competing with dilution).",
         fontsize=8, color='#2c3e50', va='top')
-ax.text(6, 11.5, "• Universal Weibull Model Decisively Rejected:\n  Optimal in only 3.3% (Mean ΔAIC = +1,264.4).",
+ax.text(6, 11.5, "• Standard Weibull Formulation Rejected:\n  Optimal in only 3.3% (Mean ΔAIC = +5,763.6).",
         fontsize=8, fontweight='bold', color='#c0392b', va='top')
 
 
@@ -140,10 +140,10 @@ ax.add_patch(box3)
 ax.text(82.5, 46.5, "Diagnostic Counter-Experiment", fontsize=10, fontweight='bold', ha='center', color='#145a32')
 ax.text(82.5, 43.5, "(Proving NO Titration as Root Cause)", fontsize=8, fontstyle='italic', ha='center', color='#7f8c8d')
 
-ax.text(71, 39, "1. Met-Only Roadside Model:\n   R² = -0.2670  (Negative Transfer)", fontsize=8, color='#c0392b')
-ax.text(71, 32.5, "2. Adding Co-Located Chemical Sinks:\n   Met + NO + NO2 → R² = -0.0764 (Gain +0.19)\n   Met + Reactive Suite → R² = +0.0195", fontsize=8, color='#2980b9')
-ax.text(71, 23.5, "3. Cross-Validation Chemical Accuracy:\n   5-Fold CV Met-Only: R² = 0.6808\n   5-Fold CV + NO & NO2: R² = 0.7800", fontsize=8, color='#1e8449')
-ax.text(71, 14.5, "4. Odd-Oxygen Photochemical Closure:\n   Modeling [Ox] = [O3] + [NO2] yields:\n   R² = 0.9533  (Near-Perfect Closure!)", fontsize=8, fontweight='bold', color='#1e8449')
+ax.text(71, 39, "1. Met-Only Roadside Model (Bidhannagar):\n   R² = -0.2577 (Negative Transfer, RMSE = 13.83)", fontsize=8, color='#c0392b')
+ax.text(71, 31.5, "2. Adding Co-Located Chemical Sinks:\n   Met + NO + NO2 → R² = -0.0764 (RMSE = 12.92)\n   Met + Reactive Suite → R² = +0.0195", fontsize=8, color='#2980b9')
+ax.text(71, 22.0, "3. Within-Airshed 5-Fold Cross-Validation:\n   Met-Only CV: R² = 0.6808\n   Met + NO + NO2 CV: R² = 0.7800", fontsize=8, color='#1e8449')
+ax.text(71, 13.5, "4. Odd-Oxygen Conservation ([Ox] = [O3] + [NO2]):\n   Conserved diurnal [Ox] pool confirms local\n   NO titration quenches roadside O3.", fontsize=8, fontweight='bold', color='#1e8449')
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 output_path1 = os.path.abspath(os.path.join(script_dir, "../figures/graphical_abstract.png"))
