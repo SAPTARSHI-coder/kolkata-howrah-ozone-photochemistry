@@ -77,6 +77,7 @@ kolkata-howrah-ozone-photochemistry/
     ├── fit_statistical_distributions.py              <-- 182-series MLE two-parameter distribution fitting
     ├── evaluate_ml_transferability.py                  <-- Cross-year Random Forest transfer & counter-experiments
     ├── generate_graphical_abstract.py                 <-- Graphical abstract generator
+    ├── export_raw_station_data.py                     <-- Unpacks 26 individual station-year Excel/CSV files
     ├── inspect_diurnal.py                             <-- Diurnal odd-oxygen titration inspection
     └── run_proof.sh                                   <-- End-to-end execution script
 ```
@@ -120,6 +121,17 @@ Generates high-resolution publication figures (300 DPI) matching the manuscript:
 ```bash
 python scripts/generate_figures.py
 ```
+
+### 5. Export Individual Station Spreadsheets (26 Station-Years)
+The full conurbation dataset is bundled inside `data/master_cleaned.pkl.gz` (721,193 records) for sub-second pipeline execution. To unpack the individual 15-minute time series for external analysis across all 13 stations (2024 & 2025):
+```bash
+# Unpack all 26 station files as Excel spreadsheets (.xlsx):
+python scripts/export_raw_station_data.py --format excel
+
+# Or export as standard CSV tables (.csv):
+python scripts/export_raw_station_data.py --format csv
+```
+*Outputs 26 individual station files directly into `data/Cleaned_Station_Data/`.*
 
 ---
 
