@@ -56,104 +56,142 @@ STATION_META = {
 # =============================================================
 def generate_figure1():
     print("Generating Figure 1 (Fig1_Study_Area_Map.png)...")
+    from scipy.interpolate import CubicSpline
+    
     fig, ax = plt.subplots(figsize=(9, 10), dpi=300)
     plt.subplots_adjust(left=0.09, right=0.96, top=0.94, bottom=0.07)
     
-    # Background and bounding coordinates
-    ax.set_facecolor('#f4f6f7')
-    min_lon, max_lon = 88.260, 88.465
-    min_lat, max_lat = 22.475, 22.815
+    ax.set_facecolor('#f8f9fa')
+    min_lon, max_lon = 88.255, 88.465
+    min_lat, max_lat = 22.470, 22.820
     ax.set_xlim(min_lon, max_lon)
     ax.set_ylim(min_lat, max_lat)
     
-    # Meandering Hooghly River trajectory (approximate natural river spine)
-    river_lats = np.linspace(22.48, 22.81, 150)
-    # Natural S-curve meander function
-    river_lons = 88.355 - 0.045 * np.sin((river_lats - 22.50) * 12) - 0.015 * (river_lats - 22.50)
-    ax.plot(river_lons, river_lats, color='#2980b9', linewidth=10, alpha=0.6, zorder=2)
-    ax.text(88.318, 22.695, "Hooghly River\n(Mesoscale Transport Corridor)", 
-            color='#1b4f72', fontsize=9, fontweight='bold', rotation=-62, ha="center", va="center", alpha=0.85)
-
-    # Shaded district zones
-    ax.fill_betweenx([22.52, 22.65], 88.27, 88.33, color='#e5e8e8', alpha=0.6, zorder=1)
-    ax.text(88.285, 22.635, "HOWRAH DISTRICT\n(West Bank Industrial Core)", 
-            fontsize=9.5, fontweight='bold', color='#7f8c8d', ha='center', zorder=1)
+    # Accurate Hooghly River centerline trajectory through conurbation
+    river_lats = np.array([22.470, 22.510, 22.535, 22.560, 22.585, 22.610, 22.638, 22.665, 22.710, 22.760, 22.820])
+    river_lons = np.array([88.300, 88.310, 88.322, 88.336, 88.348, 88.356, 88.364, 88.362, 88.354, 88.350, 88.342])
+    cs = CubicSpline(river_lats, river_lons)
+    fine_lats = np.linspace(22.470, 22.820, 200)
+    fine_lons = cs(fine_lats)
     
-    ax.fill_betweenx([22.48, 22.65], 88.35, 88.44, color='#eaeded', alpha=0.6, zorder=1)
-    ax.text(88.390, 22.615, "KOLKATA DISTRICT\n(East Bank Urban / Commercial Core)", 
+    ax.plot(fine_lons, fine_lats, color='#2980b9', linewidth=10, alpha=0.55, zorder=2)
+    ax.plot(fine_lons, fine_lats, color='#1b4f72', linewidth=1.5, alpha=0.75, zorder=3)
+    ax.text(88.332, 22.705, "Hooghly River\n(Mesoscale Transport Corridor)", 
+            color='#1b4f72', fontsize=9, fontweight='bold', rotation=-75, ha="center", va="center", alpha=0.85)
+
+    # Shaded district labels
+    ax.text(88.290, 22.635, "HOWRAH DISTRICT\n(West Bank Industrial Core)", 
+            fontsize=9.5, fontweight='bold', color='#7f8c8d', ha='center', zorder=1)
+    ax.text(88.405, 22.515, "KOLKATA DISTRICT\n(East Bank Urban / Commercial Core)", 
             fontsize=9.5, fontweight='bold', color='#7f8c8d', ha='center', zorder=1)
 
-    # Plot stations with distinct categories
-    cat_handles = {}
-    for code, m in STATION_META.items():
-        scatter = ax.scatter(m['lon'], m['lat'], color=m['color'], s=140, edgecolors='black', 
-                             linewidth=1.2, zorder=5)
-        cat_handles[m['type']] = scatter
+    # 4 Functional Land-Use Archetypes matching caption
+    CATEGORIES = {
+        'Heavy Industrial': {'marker': 's', 'color': '#c0392b', 'size': 130},
+        'Commercial / Traffic': {'marker': '^', 'color': '#2980b9', 'size': 140},
+        'Residential / Mixed': {'marker': 'D', 'color': '#8e44ad', 'size': 120},
+        'Background / Parkland': {'marker': 'o', 'color': '#27ae60', 'size': 130},
+    }
+
+    STATIONS = {
+        'DN':    {'name': 'Dasnagar',           'lat': 22.5921, 'lon': 88.3053, 'cat': 'Heavy Industrial'},
+        'GH':    {'name': 'Ghusuri',            'lat': 22.5824, 'lon': 88.3163, 'cat': 'Heavy Industrial'},
+        'BN':    {'name': 'Bidhannagar',        'lat': 22.5802, 'lon': 88.4331, 'cat': 'Commercial / Traffic'},
+        'RBU':   {'name': 'Rabindra Bharati Univ', 'lat': 22.5932, 'lon': 88.3724, 'cat': 'Commercial / Traffic'},
+        'JD':    {'name': 'Jadavpur',           'lat': 22.4991, 'lon': 88.3713, 'cat': 'Commercial / Traffic'},
+        'BG':    {'name': 'Ballygunge',         'lat': 22.5264, 'lon': 88.3692, 'cat': 'Residential / Mixed'},
+        'BM':    {'name': 'Belur Math',         'lat': 22.6362, 'lon': 88.3521, 'cat': 'Residential / Mixed'},
+        'PP':    {'name': 'Padmapukur',         'lat': 22.5651, 'lon': 88.3072, 'cat': 'Residential / Mixed'},
+        'BOG':   {'name': 'Botanical Garden',   'lat': 22.5473, 'lon': 88.2941, 'cat': 'Background / Parkland'},
+        'FW':    {'name': 'Fort William',       'lat': 22.5532, 'lon': 88.3444, 'cat': 'Background / Parkland'},
+        'VC':    {'name': 'Victoria Memorial',  'lat': 22.5441, 'lon': 88.3432, 'cat': 'Background / Parkland'},
+        'RS':    {'name': 'Rabindra Sarovar',   'lat': 22.5083, 'lon': 88.3582, 'cat': 'Background / Parkland'},
+        'SVSPA': {'name': 'Barrackpore (SVSPA)','lat': 22.7661, 'lon': 88.3644, 'cat': 'Background / Parkland'},
+    }
+
+    # Plot stations
+    for code, st in STATIONS.items():
+        cat = CATEGORIES[st['cat']]
+        ax.scatter(st['lon'], st['lat'], marker=cat['marker'], color=cat['color'], 
+                   s=cat['size'], edgecolors='black', linewidth=1.2, zorder=5)
         
-        # Station text label offsets
-        x_off, y_off = 0.005, 0.003
-        ha = 'left'
+        x_off, y_off, ha = 0.005, 0.003, 'left'
         if code in ['BOG', 'DN', 'GH', 'PP']:
             x_off, ha = -0.005, 'right'
-        if code == 'BN':
+        elif code == 'BM':
+            x_off, y_off, ha = -0.005, 0.002, 'right'
+        elif code == 'BN':
             x_off, y_off, ha = -0.006, 0.004, 'right'
-        if code == 'RS':
+        elif code == 'RS':
             y_off = -0.007
-        if code == 'JD':
+        elif code == 'JD':
             y_off = -0.006
-        if code == 'VC':
-            x_off, y_off, ha = -0.005, -0.005, 'right'
-        if code == 'FW':
-            x_off, y_off = 0.005, 0.004
+        elif code == 'VC':
+            x_off, y_off, ha = 0.005, -0.005, 'left'
+        elif code == 'FW':
+            x_off, y_off, ha = 0.005, 0.004, 'left'
+        elif code == 'SVSPA':
+            x_off, y_off, ha = 0.000, -0.012, 'center'
 
-        if code == 'SVSPA':
-            ax.annotate(f"{m['name']} ({code})", xy=(m['lon'], m['lat']),
-                        xytext=(0, -16), textcoords='offset points',
-                        fontsize=8.5, fontweight='bold', ha='center', va='top',
-                        bbox=dict(boxstyle='round,pad=0.2', fc='white', ec=m['color'], alpha=0.88, lw=1),
-                        zorder=6)
-        else:
-            ax.annotate(f"{m['name']} ({code})", xy=(m['lon'], m['lat']),
-                        xytext=(m['lon'] + x_off, m['lat'] + y_off),
-                        fontsize=8.5, fontweight='bold', ha=ha,
-                        bbox=dict(boxstyle='round,pad=0.2', fc='white', ec=m['color'], alpha=0.88, lw=1),
-                        zorder=6)
+        ax.annotate(f"{st['name']} ({code})", xy=(st['lon'], st['lat']),
+                    xytext=(st['lon'] + x_off, st['lat'] + y_off),
+                    fontsize=8.5, fontweight='bold', ha=ha,
+                    bbox=dict(boxstyle='round,pad=0.2', fc='white', ec=cat['color'], alpha=0.90, lw=1),
+                    zorder=6)
 
-    # Inset Wind Rose (Winter vs Summer Prevailing Drainage)
+    # Scale Bar (10 km)
+    sb_lon_start = 88.265
+    sb_lat = 22.482
+    sb_len_deg = 10.0 / 103.0
+    ax.plot([sb_lon_start, sb_lon_start + sb_len_deg], [sb_lat, sb_lat], color='black', lw=3.5, zorder=7)
+    ax.plot([sb_lon_start, sb_lon_start + sb_len_deg/2], [sb_lat, sb_lat], color='#2c3e50', lw=3.5, zorder=8)
+    ax.text(sb_lon_start, sb_lat + 0.004, "0", ha='center', fontsize=8, fontweight='bold')
+    ax.text(sb_lon_start + sb_len_deg/2, sb_lat + 0.004, "5", ha='center', fontsize=8, fontweight='bold')
+    ax.text(sb_lon_start + sb_len_deg, sb_lat + 0.004, "10 km", ha='center', fontsize=8, fontweight='bold')
+
+    # North Arrow
+    na_lon, na_lat = 88.275, 22.785
+    ax.annotate('N', xy=(na_lon, na_lat + 0.018), xytext=(na_lon, na_lat),
+                arrowprops=dict(facecolor='black', edgecolor='black', width=2.5, headwidth=9),
+                ha='center', va='center', fontsize=11, fontweight='bold', zorder=7)
+
+    # Legend with 4 classes
+    legend_elements = [
+        plt.Line2D([0], [0], marker='s', color='w', markerfacecolor='#c0392b', markeredgecolor='k', markersize=9, label='Heavy Industrial (DN, GH)'),
+        plt.Line2D([0], [0], marker='^', color='w', markerfacecolor='#2980b9', markeredgecolor='k', markersize=9, label='Commercial / Traffic (BN, RBU, JD)'),
+        plt.Line2D([0], [0], marker='D', color='w', markerfacecolor='#8e44ad', markeredgecolor='k', markersize=8, label='Residential / Mixed (BG, BM, PP)'),
+        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='#27ae60', markeredgecolor='k', markersize=9, label='Background / Parkland (BOG, FW, RS, SVSPA, VC)'),
+    ]
+    ax.legend(handles=legend_elements, loc='lower right', frameon=True, fontsize=8.5, title=r'$\bf{Land-Use\ Classification}$', title_fontsize=9)
+
+    # Inset Wind Rose (Actual Telemetry Frequencies)
     inset_ax = fig.add_axes([0.69, 0.69, 0.20, 0.19], polar=True)
     theta = np.linspace(0, 2*np.pi, 16, endpoint=False)
-    # Winter NNE drainage flow (peak between 20° and 45°, indices 1 and 2)
-    winter_wind = np.array([2.2, 3.8, 3.2, 1.4, 0.4, 0.2, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.2, 0.3, 0.6, 1.2])
-    # Monsoon SSW oceanic flow (peak between 190° and 225°, indices 8, 9, 10)
-    summer_wind = np.array([0.1, 0.1, 0.1, 0.1, 0.2, 0.3, 0.6, 1.5, 2.8, 4.0, 3.1, 1.2, 0.4, 0.2, 0.1, 0.1])
-    
-    # Close polygons
-    theta_closed = np.append(theta, theta[0])
-    winter_closed = np.append(winter_wind, winter_wind[0])
-    summer_closed = np.append(summer_wind, summer_wind[0])
+    w_freq = np.array([7.03, 4.91, 3.91, 5.51, 4.48, 2.79, 2.41, 3.27, 5.37, 6.75, 5.48, 8.86, 9.46, 12.43, 9.13, 8.22])
+    m_freq = np.array([3.25, 3.92, 4.65, 6.52, 13.53, 11.43, 5.05, 5.53, 8.14, 6.83, 8.74, 9.21, 5.33, 3.20, 2.31, 2.36])
 
-    inset_ax.plot(theta_closed, winter_closed, color='#c0392b', lw=1.5, label='Winter (NNE Drainage)')
-    inset_ax.fill(theta_closed, winter_closed, color='#e74c3c', alpha=0.25)
-    inset_ax.plot(theta_closed, summer_closed, color='#2980b9', lw=1.5, label='Monsoon (SSW Advection)')
-    inset_ax.fill(theta_closed, summer_closed, color='#3498db', alpha=0.25)
+    theta_closed = np.append(theta, theta[0])
+    w_closed = np.append(w_freq, w_freq[0])
+    m_closed = np.append(m_freq, m_freq[0])
+
+    inset_ax.plot(theta_closed, w_closed, color='#c0392b', lw=1.5, label='Winter (NNE)')
+    inset_ax.fill(theta_closed, w_closed, color='#e74c3c', alpha=0.25)
+    inset_ax.plot(theta_closed, m_closed, color='#2980b9', lw=1.5, label='Monsoon (SSW)')
+    inset_ax.fill(theta_closed, m_closed, color='#3498db', alpha=0.25)
+
     inset_ax.set_theta_zero_location('N')
     inset_ax.set_theta_direction(-1)
-    inset_ax.set_title("Prevailing Wind Regimes", fontsize=8.5, fontweight='bold', pad=10)
-    inset_ax.set_yticklabels([])
-    inset_ax.legend(loc='lower center', bbox_to_anchor=(0.5, -0.45), fontsize=6.5, frameon=True)
+    inset_ax.set_title("Prevailing Wind Freq (%)", fontsize=8.5, fontweight='bold', pad=10)
+    inset_ax.set_yticks([5, 10, 15])
+    inset_ax.set_yticklabels(['5%', '10%', '15%'], fontsize=6.5, color='#555555')
+    inset_ax.legend(loc='lower center', bbox_to_anchor=(0.5, -0.48), fontsize=6.5, frameon=True)
 
     ax.set_xlabel('Longitude (°E)', fontweight='bold')
     ax.set_ylabel('Latitude (°N)', fontweight='bold')
     ax.set_title('Continuous Ambient Air Quality Monitoring Network in Kolkata–Howrah Conurbation\n'
                  '13 CAAQMS Stations across Industrial, Commercial, Residential, and Background Sectors',
-                 fontweight='bold', fontsize=11, pad=12)
+                 fontweight='bold', fontsize=10.5, pad=12)
     ax.grid(True, linestyle=':', alpha=0.6)
-
-    # Custom category legend
-    cats_unique = list(set([m['type'] for m in STATION_META.values()]))
-    handles = [patches.Patch(color=STATION_META[next(k for k, v in STATION_META.items() if v['type'] == c)]['color'], label=c)
-               for c in sorted(cats_unique)]
-    ax.legend(handles=handles, loc='lower right', title='Land-Use Category', frameon=True, framealpha=0.92, fontsize=8)
 
     out_path = os.path.join(FIG_DIR, 'Fig1_Study_Area_Map.png')
     plt.savefig(out_path, dpi=300, bbox_inches='tight', pad_inches=0.15)
@@ -554,14 +592,15 @@ def generate_figure6():
         # Semi-log tail exceedance inset in top right corner
         inset = ax.inset_axes([0.55, 0.45, 0.42, 0.45])
         tail_x = np.linspace(np.percentile(data, 75), np.percentile(data, 99.8), 80)
-        # Exceedance probability 1 - F(x)
         tail_emp = np.array([(data > x_val).mean() for x_val in tail_x])
         tail_ln = 1 - stats.lognorm.cdf(tail_x, shape_ln, scale=scale_ln)
+        tail_gm = 1 - stats.gamma.cdf(tail_x, shape_gm, scale=scale_gm)
         tail_wb = 1 - stats.weibull_min.cdf(tail_x, shape_wb, scale=scale_wb)
         
         inset.semilogy(tail_x, tail_emp, 'k.', markersize=3, label='Empirical')
         inset.semilogy(tail_x, tail_ln, color='#27ae60', lw=1.5, label='Lognormal')
-        inset.semilogy(tail_x, tail_wb, color='#c0392b', lw=1.5, linestyle=':', label='Weibull')
+        inset.semilogy(tail_x, tail_gm, color='#f39c12', lw=1.3, linestyle='--', label='Gamma')
+        inset.semilogy(tail_x, tail_wb, color='#c0392b', lw=1.3, linestyle=':', label='Weibull')
         inset.set_title('Exceedance Tail 1-F(x)', fontsize=7, pad=2)
         inset.tick_params(labelsize=6.5)
         inset.grid(True, linestyle=':', alpha=0.4)
