@@ -49,7 +49,7 @@ def run_forward_transfer():
         h24['Hour'] = h24['DateTime'].dt.hour
         h25['Hour'] = h25['DateTime'].dt.hour
 
-    features = ['AT', 'RH', 'WS', 'WD', 'BP', 'RF', 'Hour']
+    features = ['AT', 'RH', 'WS', 'WD', 'BP', 'Hour']
     target = 'Ozone'
     
     tr = h24[features + [target]].dropna()
@@ -76,9 +76,9 @@ def run_forward_transfer():
         'Model': 'Random Forest',
         'Train_Year': 2024,
         'Test_Year': 2025,
-        'R2': -0.2577,
-        'RMSE': 13.83,
-        'MAE': 9.15
+        'R2': round(r2, 4),
+        'RMSE': round(rmse, 2),
+        'MAE': round(mae, 2)
     }])
     
     out_csv = os.path.join(script_dir, "../results/ml_forward_transfer_baseline.csv")
@@ -88,9 +88,9 @@ def run_forward_transfer():
     print("=" * 60)
     print("RANDOM FOREST FORWARD TRANSFER RESULTS (2024 -> 2025)")
     print(f"Station: Bidhannagar (BN) Roadside Corridor")
-    print(f"Test R^2:  -0.2577 (Evaluated: {r2:.4f})")
-    print(f"Test RMSE: 13.83 ug/m3 (Evaluated: {rmse:.2f})")
-    print(f"Test MAE:  9.15 ug/m3 (Evaluated: {mae:.2f})")
+    print(f"Test R^2:  {round(r2, 4):.4f}")
+    print(f"Test RMSE: {round(rmse, 2):.2f} ug/m3")
+    print(f"Test MAE:  {round(mae, 2):.2f} ug/m3")
     print(f"Results saved to: {out_csv}")
     print("=" * 60)
     
