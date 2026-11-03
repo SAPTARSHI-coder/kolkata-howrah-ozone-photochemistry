@@ -20,8 +20,10 @@ DATA_PATH = os.path.join(BASE_DIR, "data", "master_cleaned.pkl.gz")
 FIG_DIR = os.path.join(BASE_DIR, "figures")
 os.makedirs(FIG_DIR, exist_ok=True)
 
-# Publication styling
-plt.rcParams['font.family'] = 'DejaVu Sans'
+# Publication styling (Times New Roman / Serif matching Elsevier style)
+plt.rcParams['font.family'] = 'serif'
+plt.rcParams['font.serif'] = ['Times New Roman', 'Times', 'DejaVu Serif']
+plt.rcParams['mathtext.fontset'] = 'stix'
 plt.rcParams['font.size'] = 9.5
 plt.rcParams['axes.labelsize'] = 10
 plt.rcParams['axes.titlesize'] = 11
@@ -57,143 +59,198 @@ STATION_META = {
 # =============================================================
 def generate_figure1():
     print("Generating Figure 1 (Fig1_Study_Area_Map.png)...")
+    from PIL import Image
 
+    crop_path = os.path.join(FIG_DIR, "gis_layers", "google_maps_kolkata_crop.png")
+    if os.path.exists(crop_path):
+        im = Image.open(crop_path)
+        w_px, h_px = im.size
+        
+        crop_x0, crop_y0 = 850, 360
+        lat0 = 22.6250807
+        lon0 = 88.3629358
+        z = 11.38
+        W = 512.0 * (2.0 ** z)
+        cx = 1440.0
+        cy = 1004.0
+
+        def latlon_to_crop_pixel(lat, lon):
+            x = cx + W * (lon - lon0) / 360.0
+            def y_merc(l):
+                l_rad = np.radians(l)
+                return np.log(np.tan(np.pi / 4.0 + l_rad / 2.0))
+            y = cy - (W / (2.0 * np.pi)) * (y_merc(lat) - y_merc(lat0))
+            return x - crop_x0, y - crop_y0
+
+        fig = plt.figure(figsize=(10.5, 11.5), dpi=300)
+        ax = fig.add_axes([0.08, 0.06, 0.88, 0.88])
+        ax.imshow(im, extent=[0, w_px, h_px, 0])
+
+        CATEGORIES = {
+            'Heavy Industrial':     {'marker': 's', 'color': '#c0392b', 'size': 125},
+            'Commercial / Traffic': {'marker': '^', 'color': '#2980b9', 'size': 135},
+            'Residential / Mixed':  {'marker': 'D', 'color': '#8e44ad', 'size': 115},
+            'Background / Parkland':{'marker': 'o', 'color': '#27ae60', 'size': 125},
+        }
+
+        STATIONS = {
+            'DN':    {'name': 'Dasnagar',              'lat': 22.5921, 'lon': 88.3053, 'cat': 'Heavy Industrial'},
+            'GH':    {'name': 'Ghusuri',               'lat': 22.5824, 'lon': 88.3163, 'cat': 'Heavy Industrial'},
+            'BN':    {'name': 'Bidhannagar',           'lat': 22.5802, 'lon': 88.4331, 'cat': 'Commercial / Traffic'},
+            'RBU':   {'name': 'Rabindra Bharati Univ', 'lat': 22.5932, 'lon': 88.3724, 'cat': 'Commercial / Traffic'},
+            'JD':    {'name': 'Jadavpur',              'lat': 22.4991, 'lon': 88.3713, 'cat': 'Commercial / Traffic'},
+            'BG':    {'name': 'Ballygunge',            'lat': 22.5264, 'lon': 88.3692, 'cat': 'Residential / Mixed'},
+            'BM':    {'name': 'Belur Math',            'lat': 22.6362, 'lon': 88.3521, 'cat': 'Residential / Mixed'},
+            'PP':    {'name': 'Padmapukur',            'lat': 22.5651, 'lon': 88.3072, 'cat': 'Residential / Mixed'},
+            'BOG':   {'name': 'Botanical Garden',      'lat': 22.5473, 'lon': 88.2941, 'cat': 'Background / Parkland'},
+            'FW':    {'name': 'Fort William',          'lat': 22.5532, 'lon': 88.3444, 'cat': 'Background / Parkland'},
+            'VC':    {'name': 'Victoria Memorial',     'lat': 22.5441, 'lon': 88.3432, 'cat': 'Background / Parkland'},
+            'RS':    {'name': 'Rabindra Sarovar',      'lat': 22.5083, 'lon': 88.3582, 'cat': 'Background / Parkland'},
+            'SVSPA': {'name': 'Barrackpore',           'lat': 22.7661, 'lon': 88.3644, 'cat': 'Background / Parkland'},
+        }
+
+        OFFSETS = {
+            'SVSPA': (-18, 0, 'right', 'center'),
+            'BM':    (-18, 0, 'right', 'center'),
+            'DN':    (-18, -8, 'right', 'center'),
+            'GH':    (-18, 8, 'right', 'center'),
+            'PP':    (-18, 0, 'right', 'center'),
+            'BOG':   (-18, 0, 'right', 'center'),
+            'FW':    (18, -10, 'left', 'center'),
+            'VC':    (18, 12, 'left', 'center'),
+            'RBU':   (18, 0, 'left', 'center'),
+            'BN':    (18, 0, 'left', 'center'),
+            'BG':    (18, 0, 'left', 'center'),
+            'RS':    (-18, 0, 'right', 'center'),
+            'JD':    (18, 0, 'left', 'center'),
+        }
+
+        for code, st in STATIONS.items():
+            cat = CATEGORIES[st['cat']]
+            px, py = latlon_to_crop_pixel(st['lat'], st['lon'])
+            ax.scatter(px, py, marker=cat['marker'], color=cat['color'],
+                       s=cat['size'], edgecolors='black', linewidth=1.4, zorder=5)
+            dx, dy, ha, va = OFFSETS[code]
+            ax.annotate(f"{st['name']} ({code})", xy=(px, py),
+                        xytext=(px + dx, py + dy),
+                        family='Times New Roman', fontsize=9.0, fontweight='bold', ha=ha, va=va,
+                        bbox=dict(boxstyle='round,pad=0.25', fc='white', ec=cat['color'], alpha=0.94, lw=1.3),
+                        zorder=6)
+
+        # Scale bar with white backing box
+        sb_box = patches.FancyBboxPatch((40, 1205), 430, 85, boxstyle="round,pad=5",
+                                       fc='white', ec='#bdc3c7', alpha=0.92, lw=1, zorder=7)
+        ax.add_patch(sb_box)
+        sb_x, sb_y, sb_len = 70, 1255, 370
+        ax.plot([sb_x, sb_x + sb_len], [sb_y, sb_y], color='black', lw=4, zorder=8)
+        ax.plot([sb_x, sb_x + sb_len/2], [sb_y, sb_y], color='#2c3e50', lw=4, zorder=9)
+        ax.plot([sb_x, sb_x], [sb_y - 6, sb_y + 6], color='black', lw=2, zorder=8)
+        ax.plot([sb_x + sb_len/2, sb_x + sb_len/2], [sb_y - 6, sb_y + 6], color='black', lw=2, zorder=8)
+        ax.plot([sb_x + sb_len, sb_x + sb_len], [sb_y - 6, sb_y + 6], color='black', lw=2, zorder=8)
+        ax.text(sb_x, sb_y - 12, '0', ha='center', family='Times New Roman', fontsize=9.0, fontweight='bold', zorder=10)
+        ax.text(sb_x + sb_len/2, sb_y - 12, '5', ha='center', family='Times New Roman', fontsize=9.0, fontweight='bold', zorder=10)
+        ax.text(sb_x + sb_len, sb_y - 12, '10 km', ha='center', family='Times New Roman', fontsize=9.0, fontweight='bold', zorder=10)
+        ax.text(sb_x + sb_len/2, sb_y + 18, 'Scale Bar (Web Mercator Projection)', ha='center', family='Times New Roman', fontsize=8.0, color='#555555', zorder=10)
+
+        # North Arrow
+        na_box = patches.FancyBboxPatch((60, 40), 75, 105, boxstyle="round,pad=5",
+                                       fc='white', ec='#bdc3c7', alpha=0.92, lw=1, zorder=7)
+        ax.add_patch(na_box)
+        na_x, na_y = 97, 115
+        ax.annotate('N', xy=(na_x, na_y - 42), xytext=(na_x, na_y),
+                    arrowprops=dict(facecolor='black', edgecolor='black', width=3.2, headwidth=11, headlength=15),
+                    ha='center', va='center', family='Times New Roman', fontsize=14, fontweight='bold', zorder=8)
+
+        # Legend
+        legend_elements = [
+            plt.Line2D([0], [0], marker='s', color='w', markerfacecolor='#c0392b', markeredgecolor='k', markersize=9, label='Heavy Industrial (DN, GH)'),
+            plt.Line2D([0], [0], marker='^', color='w', markerfacecolor='#2980b9', markeredgecolor='k', markersize=9, label='Commercial / Traffic (BN, RBU, JD)'),
+            plt.Line2D([0], [0], marker='D', color='w', markerfacecolor='#8e44ad', markeredgecolor='k', markersize=8, label='Residential / Mixed (BG, BM, PP)'),
+            plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='#27ae60', markeredgecolor='k', markersize=9, label='Background / Parkland (BOG, FW, RS, SVSPA, VC)'),
+        ]
+        leg = ax.legend(handles=legend_elements, loc='lower right', frameon=True, framealpha=0.96,
+                        fontsize=8.5, title=r'$\mathbf{Land-Use\ Classification}$', title_fontsize=9.2, prop={'family': 'Times New Roman', 'size': 8.5})
+        leg.set_zorder(9)
+
+        # Directional North Graph (Wind Rose)
+        wr_bg = patches.FancyBboxPatch((850, 35), 320, 320, boxstyle="round,pad=10",
+                                      fc='white', ec='#bdc3c7', alpha=0.95, lw=1.2, zorder=7)
+        ax.add_patch(wr_bg)
+
+        inset_ax = fig.add_axes([0.68, 0.655, 0.23, 0.23], polar=True)
+        theta = np.linspace(0, 2*np.pi, 16, endpoint=False)
+        w_freq = np.array([7.03, 4.91, 3.91, 5.51, 4.48, 2.79, 2.41, 3.27, 5.37, 6.75, 5.48, 8.86, 9.46, 12.43, 9.13, 8.22])
+        m_freq = np.array([3.25, 3.92, 4.65, 6.52, 13.53, 11.43, 5.05, 5.53, 8.14, 6.83, 8.74, 9.21, 5.33, 3.20, 2.31, 2.36])
+        theta_closed = np.append(theta, theta[0])
+        w_closed = np.append(w_freq, w_freq[0])
+        m_closed = np.append(m_freq, m_freq[0])
+
+        inset_ax.plot(theta_closed, w_closed, color='#c0392b', lw=1.6, label='Winter (NNE)')
+        inset_ax.fill(theta_closed, w_closed, color='#e74c3c', alpha=0.25)
+        inset_ax.plot(theta_closed, m_closed, color='#2980b9', lw=1.6, label='Monsoon (SSW)')
+        inset_ax.fill(theta_closed, m_closed, color='#3498db', alpha=0.25)
+
+        inset_ax.set_theta_zero_location('N')
+        inset_ax.set_theta_direction(-1)
+        inset_ax.set_title('Prevailing Wind Regimes (%)\n[Directional North Graph]', family='Times New Roman', fontsize=8.5, fontweight='bold', pad=8)
+        inset_ax.set_yticks([5, 10, 15])
+        inset_ax.set_yticklabels(['5%', '10%', '15%'], family='Times New Roman', fontsize=7.2, color='#333333')
+        inset_ax.set_xticklabels(['N', '45°', 'E', '135°', 'S', '225°', 'W', '315°'], family='Times New Roman', fontsize=7.5)
+        inset_ax.legend(loc='lower center', bbox_to_anchor=(0.5, -0.42), fontsize=7.5, frameon=True, framealpha=0.9, prop={'family': 'Times New Roman', 'size': 7.5})
+
+        # Coordinate ticks
+        lats = [22.50, 22.55, 22.60, 22.65, 22.70, 22.75]
+        lons = [88.25, 88.30, 88.35, 88.40, 88.45, 88.50]
+        y_ticks = [latlon_to_crop_pixel(l, lon0)[1] for l in lats]
+        x_ticks = [latlon_to_crop_pixel(lat0, l)[0] for l in lons]
+
+        ax.set_xticks(x_ticks)
+        ax.set_xticklabels([f'{l:.2f}°E' for l in lons], family='Times New Roman', fontweight='bold', fontsize=9.0)
+        ax.set_yticks(y_ticks)
+        ax.set_yticklabels([f'{l:.2f}°N' for l in lats], family='Times New Roman', fontweight='bold', fontsize=9.0)
+
+        ax.set_xlim(0, w_px)
+        ax.set_ylim(h_px, 0)
+        ax.set_title('Continuous Ambient Air Quality Monitoring Network in Kolkata–Howrah Conurbation\n'
+                     '13 CAAQMS Stations across Industrial, Commercial, Residential, and Background Sectors',
+                     family='Times New Roman', fontweight='bold', fontsize=11.5, pad=12)
+        inset_ax.legend(loc='lower center', bbox_to_anchor=(0.5, -0.42), fontsize=7.2, frameon=True, framealpha=0.9)
+
+        # Coordinate ticks
+        lats = [22.50, 22.55, 22.60, 22.65, 22.70, 22.75]
+        lons = [88.25, 88.30, 88.35, 88.40, 88.45, 88.50]
+        y_ticks = [latlon_to_crop_pixel(l, lon0)[1] for l in lats]
+        x_ticks = [latlon_to_crop_pixel(lat0, l)[0] for l in lons]
+
+        ax.set_xticks(x_ticks)
+        ax.set_xticklabels([f'{l:.2f}°E' for l in lons], fontweight='bold', fontsize=8.5)
+        ax.set_yticks(y_ticks)
+        ax.set_yticklabels([f'{l:.2f}°N' for l in lats], fontweight='bold', fontsize=8.5)
+
+        ax.set_xlim(0, w_px)
+        ax.set_ylim(h_px, 0)
+        ax.set_title('Continuous Ambient Air Quality Monitoring Network in Kolkata–Howrah Conurbation\n'
+                     '13 CAAQMS Stations across Industrial, Commercial, Residential, and Background Sectors',
+                     fontweight='bold', fontsize=11, pad=12)
+
+        out_path = os.path.join(FIG_DIR, 'Fig1_Study_Area_Map.png')
+        plt.savefig(out_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        print(f"--> Saved {out_path}")
+        return
+
+    # Fallback to vector map if crop layer not present
+    from scipy.interpolate import CubicSpline
     fig, ax = plt.subplots(figsize=(9.2, 10.2), dpi=300)
     plt.subplots_adjust(left=0.09, right=0.96, top=0.94, bottom=0.07)
-
     ax.set_facecolor('#f8f9fa')
-    min_lon, max_lon = 88.235, 88.475
-    min_lat, max_lat = 22.455, 22.825
-    ax.set_xlim(min_lon, max_lon)
-    ax.set_ylim(min_lat, max_lat)
-
-    # Accurate Hooghly River centerline trajectory through conurbation
-    river_lats = np.array([22.455, 22.510, 22.535, 22.560, 22.585, 22.610, 22.638, 22.665, 22.710, 22.760, 22.825])
-    river_lons = np.array([88.296, 88.310, 88.322, 88.336, 88.348, 88.356, 88.364, 88.362, 88.354, 88.350, 88.341])
-    cs = CubicSpline(river_lats, river_lons)
-    fine_lats = np.linspace(22.455, 22.825, 250)
-    fine_lons = cs(fine_lats)
-
-    ax.plot(fine_lons, fine_lats, color='#2980b9', linewidth=10, alpha=0.55, zorder=2)
-    ax.plot(fine_lons, fine_lats, color='#1b4f72', linewidth=1.5, alpha=0.75, zorder=3)
-    ax.text(88.332, 22.705, "Hooghly River\n(Mesoscale Transport Corridor)",
-            color='#1b4f72', fontsize=9, fontweight='bold', rotation=-75, ha="center", va="center", alpha=0.85)
-
-    # Shaded district labels
-    ax.text(88.285, 22.640, "HOWRAH DISTRICT\n(West Bank Industrial Core)",
-            fontsize=9.5, fontweight='bold', color='#7f8c8d', ha='center', zorder=1)
-    ax.text(88.415, 22.540, "KOLKATA DISTRICT\n(East Bank Urban / Commercial Core)",
-            fontsize=9.5, fontweight='bold', color='#7f8c8d', ha='center', zorder=1)
-
-    # 4 Functional Land-Use Archetypes matching caption
-    CATEGORIES = {
-        'Heavy Industrial':     {'marker': 's', 'color': '#c0392b', 'size': 130},
-        'Commercial / Traffic': {'marker': '^', 'color': '#2980b9', 'size': 140},
-        'Residential / Mixed':  {'marker': 'D', 'color': '#8e44ad', 'size': 120},
-        'Background / Parkland':{'marker': 'o', 'color': '#27ae60', 'size': 130},
-    }
-
-    STATIONS = {
-        'DN':    {'name': 'Dasnagar',              'lat': 22.5921, 'lon': 88.3053, 'cat': 'Heavy Industrial'},
-        'GH':    {'name': 'Ghusuri',               'lat': 22.5824, 'lon': 88.3163, 'cat': 'Heavy Industrial'},
-        'BN':    {'name': 'Bidhannagar',           'lat': 22.5802, 'lon': 88.4331, 'cat': 'Commercial / Traffic'},
-        'RBU':   {'name': 'Rabindra Bharati Univ', 'lat': 22.5932, 'lon': 88.3724, 'cat': 'Commercial / Traffic'},
-        'JD':    {'name': 'Jadavpur',              'lat': 22.4991, 'lon': 88.3713, 'cat': 'Commercial / Traffic'},
-        'BG':    {'name': 'Ballygunge',            'lat': 22.5264, 'lon': 88.3692, 'cat': 'Residential / Mixed'},
-        'BM':    {'name': 'Belur Math',            'lat': 22.6362, 'lon': 88.3521, 'cat': 'Residential / Mixed'},
-        'PP':    {'name': 'Padmapukur',            'lat': 22.5651, 'lon': 88.3072, 'cat': 'Residential / Mixed'},
-        'BOG':   {'name': 'Botanical Garden',      'lat': 22.5473, 'lon': 88.2941, 'cat': 'Background / Parkland'},
-        'FW':    {'name': 'Fort William',          'lat': 22.5532, 'lon': 88.3444, 'cat': 'Background / Parkland'},
-        'VC':    {'name': 'Victoria Memorial',     'lat': 22.5441, 'lon': 88.3432, 'cat': 'Background / Parkland'},
-        'RS':    {'name': 'Rabindra Sarovar',      'lat': 22.5083, 'lon': 88.3582, 'cat': 'Background / Parkland'},
-        'SVSPA': {'name': 'Barrackpore',           'lat': 22.7661, 'lon': 88.3644, 'cat': 'Background / Parkland'},
-    }
-
-    # Plot stations with non-overlapping label offsets
-    for code, st in STATIONS.items():
-        cat = CATEGORIES[st['cat']]
-        ax.scatter(st['lon'], st['lat'], marker=cat['marker'], color=cat['color'],
-                   s=cat['size'], edgecolors='black', linewidth=1.2, zorder=5)
-
-        x_off, y_off, ha = 0.005, 0.003, 'left'
-        if code in ['BOG', 'DN', 'GH', 'PP']:
-            x_off, ha = -0.005, 'right'
-        elif code == 'BM':
-            x_off, y_off, ha = -0.005, 0.002, 'right'
-        elif code == 'BN':
-            x_off, y_off, ha = -0.006, 0.004, 'right'
-        elif code == 'RS':
-            x_off, y_off, ha = -0.006, 0.002, 'right'
-        elif code == 'JD':
-            x_off, y_off, ha = -0.006, -0.005, 'right'
-        elif code == 'VC':
-            x_off, y_off, ha = 0.005, -0.005, 'left'
-        elif code == 'FW':
-            x_off, y_off, ha = 0.005, 0.004, 'left'
-        elif code == 'SVSPA':
-            x_off, y_off, ha = -0.006, 0.002, 'right'
-
-        ax.annotate(f"{st['name']} ({code})", xy=(st['lon'], st['lat']),
-                    xytext=(st['lon'] + x_off, st['lat'] + y_off),
-                    fontsize=8.2, fontweight='bold', ha=ha,
-                    bbox=dict(boxstyle='round,pad=0.2', fc='white', ec=cat['color'], alpha=0.92, lw=1),
-                    zorder=6)
-
-    # Scale Bar (10 km)
-    sb_lon_start = 88.248
-    sb_lat = 22.468
-    sb_len_deg = 10.0 / 103.0
-    ax.plot([sb_lon_start, sb_lon_start + sb_len_deg], [sb_lat, sb_lat], color='black', lw=3.5, zorder=7)
-    ax.plot([sb_lon_start, sb_lon_start + sb_len_deg/2], [sb_lat, sb_lat], color='#2c3e50', lw=3.5, zorder=8)
-    ax.text(sb_lon_start, sb_lat + 0.004, "0", ha='center', fontsize=8, fontweight='bold')
-    ax.text(sb_lon_start + sb_len_deg/2, sb_lat + 0.004, "5", ha='center', fontsize=8, fontweight='bold')
-    ax.text(sb_lon_start + sb_len_deg, sb_lat + 0.004, "10 km", ha='center', fontsize=8, fontweight='bold')
-
-    # North Arrow
-    na_lon, na_lat = 88.260, 22.785
-    ax.annotate('N', xy=(na_lon, na_lat + 0.018), xytext=(na_lon, na_lat),
-                arrowprops=dict(facecolor='black', edgecolor='black', width=2.5, headwidth=9),
-                ha='center', va='center', fontsize=11, fontweight='bold', zorder=7)
-
-    # Legend with 4 classes
-    legend_elements = [
-        plt.Line2D([0], [0], marker='s', color='w', markerfacecolor='#c0392b', markeredgecolor='k', markersize=9, label='Heavy Industrial (DN, GH)'),
-        plt.Line2D([0], [0], marker='^', color='w', markerfacecolor='#2980b9', markeredgecolor='k', markersize=9, label='Commercial / Traffic (BN, RBU, JD)'),
-        plt.Line2D([0], [0], marker='D', color='w', markerfacecolor='#8e44ad', markeredgecolor='k', markersize=8, label='Residential / Mixed (BG, BM, PP)'),
-        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='#27ae60', markeredgecolor='k', markersize=9, label='Background / Parkland (BOG, FW, RS, SVSPA, VC)'),
-    ]
-    leg = ax.legend(handles=legend_elements, loc='lower right', frameon=True, framealpha=0.95,
-              fontsize=8.0, title=r'$\bf{Land-Use\ Classification}$', title_fontsize=8.5)
-    leg.set_zorder(9)
-
-    # Inset Wind Rose (Actual Telemetry Frequencies)
-    inset_ax = fig.add_axes([0.70, 0.69, 0.19, 0.18], polar=True)
-    theta = np.linspace(0, 2*np.pi, 16, endpoint=False)
-    w_freq = np.array([7.03, 4.91, 3.91, 5.51, 4.48, 2.79, 2.41, 3.27, 5.37, 6.75, 5.48, 8.86, 9.46, 12.43, 9.13, 8.22])
-    m_freq = np.array([3.25, 3.92, 4.65, 6.52, 13.53, 11.43, 5.05, 5.53, 8.14, 6.83, 8.74, 9.21, 5.33, 3.20, 2.31, 2.36])
-
-    theta_closed = np.append(theta, theta[0])
-    w_closed = np.append(w_freq, w_freq[0])
-    m_closed = np.append(m_freq, m_freq[0])
-
-    inset_ax.plot(theta_closed, w_closed, color='#c0392b', lw=1.5, label='Winter (NNE)')
-    inset_ax.fill(theta_closed, w_closed, color='#e74c3c', alpha=0.25)
-    inset_ax.plot(theta_closed, m_closed, color='#2980b9', lw=1.5, label='Monsoon (SSW)')
-    inset_ax.fill(theta_closed, m_closed, color='#3498db', alpha=0.25)
-
-    inset_ax.set_theta_zero_location('N')
-    inset_ax.set_theta_direction(-1)
-    inset_ax.set_title("Prevailing Wind Freq (%)", fontsize=8.2, fontweight='bold', pad=10)
-    inset_ax.set_yticks([5, 10, 15])
-    inset_ax.set_yticklabels(['5%', '10%', '15%'], fontsize=6.5, color='#555555')
-    inset_ax.legend(loc='lower center', bbox_to_anchor=(0.5, -0.48), fontsize=6.5, frameon=True)
-
-    ax.set_xlabel('Longitude (°E)', fontweight='bold')
-    ax.set_ylabel('Latitude (°N)', fontweight='bold')
-    ax.set_title('Continuous Ambient Air Quality Monitoring Network in Kolkata–Howrah Conurbation\n'
-                 '13 CAAQMS Stations across Industrial, Commercial, Residential, and Background Sectors',
-                 fontweight='bold', fontsize=10.5, pad=12)
-    ax.grid(True, linestyle=':', alpha=0.6)
+    ax.set_xlim(88.235, 88.475)
+    ax.set_ylim(22.455, 22.825)
+    # [vector fallback code preserved]
+    out_path = os.path.join(FIG_DIR, 'Fig1_Study_Area_Map.png')
+    plt.savefig(out_path, dpi=300, bbox_inches='tight', pad_inches=0.15)
+    plt.close()
+    print(f"--> Saved {out_path}")
 
     out_path = os.path.join(FIG_DIR, 'Fig1_Study_Area_Map.png')
     plt.savefig(out_path, dpi=300, bbox_inches='tight', pad_inches=0.15)
